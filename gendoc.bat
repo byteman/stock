@@ -1,0 +1,1 @@
+apidoc -i controllers/ -o apidoc/

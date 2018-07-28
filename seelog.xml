@@ -1,0 +1,23 @@
+<seelog minlevel="debug">
+    <outputs>
+        <splitter formatid="common">
+            <console formatid="color"/>
+
+             <rollingfile type="date" filename="logs/wkmonitor.log" datepattern="02.01.2006" maxrolls="30" />
+
+        </splitter>
+        <!--<filter levels="error">-->
+            <!--<console formatid="color-red"/>-->
+        <!--</filter>-->
+        <!--<filter levels="debug">-->
+            <!--<console formatid="color-green"/>-->
+        <!--</filter>-->
+    </outputs>
+    <formats>
+        <format id="color" format="[%LEV] %Date %Time %File %FuncShort:%Line %Msg%n"/>
+        <format id="color-red" format="%EscM(41) [%LEV] %Date %Time %File %FuncShort:%Line %Msg%n%EscM(0)"/>
+        <format id="color-green" format="%EscM(44) [%LEV] %Date %Time %File %FuncShort:%Line %Msg%n%EscM(0)"/>
+        <!--<format id="color-yellow" format="%EscM(43) [%LEV] %Date %Time %File %FuncShort:%Line %Msg%n%EscM(0)"/>-->
+        <format id="common" format="[%LEV] %Date %Time %File %FuncShort:%Line %Msg%n"/>
+    </formats>
+</seelog>

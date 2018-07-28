@@ -1,0 +1,21 @@
+.idea
+*.exe
+*.exe~
+log
+Makefile
+debug
+*.user
+*.Release
+*.Debug
+ui_mainwindow.h
+ui_formlogin.h
+ui_*.h
+output
+*.csv
+
+*.log
+logs/
+*.bak
+manager/release
+*.4ea475a
+Navicat for MySQL
