@@ -10,6 +10,8 @@ import (
 	"sync"
 	"strconv"
 	"net/http"
+	"github.com/axgle/mahonia"
+	"io/ioutil"
 )
 
 var mutex sync.Mutex
@@ -100,10 +102,32 @@ func queryStock(c *gin.Context)  {
 		})
 	}
 }
+func ConvertToByte(src string, srcCode string, targetCode string) []byte {
+	srcCoder := mahonia.NewDecoder(srcCode)
+	srcResult := srcCoder.ConvertString(src)
+	tagCoder := mahonia.NewDecoder(targetCode)
+	_, cdata, _ := tagCoder.Translate([]byte(srcResult), true)
+	return cdata
+}
+func convGbk2Utf8(file string)error{
+
+
+	data,err:=ioutil.ReadFile(file)
+	if err!=nil{
+		return err
+	}
+	utf8 := ConvertToByte(string(data), "gbk", "utf8")
+
+	return ioutil.WriteFile(file,[]byte(utf8),0666)
+
+
+}
 func uploadFile(c *gin.Context)  {
 	file, _ := c.FormFile("file")
 	fmt.Println(file.Filename)
+
 	c.SaveUploadedFile(file,"appstockdata.txt")
+	convGbk2Utf8("appstockdata.txt")
 	loadStock()
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
