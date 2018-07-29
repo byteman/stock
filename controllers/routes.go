@@ -13,7 +13,7 @@ func RouteRegister(e *gin.Engine)  {
 
 	e.Static("/doc","./apidoc")
 	//e.Static("/","./cloudwalk")
-	e.Static("/web","./static/web")
+	e.Static("/web","./static/dist")
 	e.GET("/", func(c *gin.Context) {
 		e.LoadHTMLFiles("./static/web/redirect.html")
 		c.HTML(200,"redirect.html",nil)
@@ -47,12 +47,14 @@ func RouteRegister(e *gin.Engine)  {
 	e.Static("/static","./static")
 	e.Static("/admin","./static/admin")
 	e.GET("/stock/:id",queryStock)
+	e.POST("/upload",uploadFile)
 	auth := e.Group("/api/v1")
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{
 		auth.GET("/hello", helloHandler)
 		auth.GET("/refresh_token", authMiddleware.RefreshHandler)
 		auth.GET("/stock/:id",queryStock)
+		auth.POST("/upload",uploadFile)
 		auth.GET("/user/info", func(c *gin.Context) {
 			c.JSON(200,gin.H{
 				"roles":"admin",

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"strconv"
+	"net/http"
 )
 
 var mutex sync.Mutex
@@ -99,7 +100,13 @@ func queryStock(c *gin.Context)  {
 		})
 	}
 }
-
+func uploadFile(c *gin.Context)  {
+	file, _ := c.FormFile("file")
+	fmt.Println(file.Filename)
+	c.SaveUploadedFile(file,"appstockdata.txt")
+	loadStock()
+	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+}
 func init()  {
 	loadStock()
 }
