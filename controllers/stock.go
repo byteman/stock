@@ -12,48 +12,67 @@ import (
 )
 
 var mutex sync.Mutex
-var stocks map[string]float32
+
+type StockInfo struct{
+	Value float64 `json:"value"`
+	Name string `json:"name"`
+	Code string `json:"code"`
+}
+var stocks map[string]StockInfo
+
+func trim(str string)string  {
+	str = strings.Replace(str, " ", "", -1)
+	// 去除换行符
+	str = strings.Replace(str, "\n", "", -1)
+
+	str = strings.Replace(str, "\r", "", -1)
+	return str
+}
 func loadStock()error  {
-	f, err := os.Open("stock.txt")
+	f, err := os.Open("appstockdata.txt")
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 	defer f.Close()
-	stocks = make(map[string]float32)
+	stocks = make(map[string]StockInfo)
 	rd := bufio.NewReader(f)
 	for {
 		line, err := rd.ReadString('\n') //以'\n'为结束符读入一行
-
+		//fmt.Println("line=",line)
 		if err != nil || io.EOF == err {
 			fmt.Println(err)
 			break
 		}
-		items:=strings.Split(line,"  ")
+		items:=strings.SplitN(line,"  ",3)
 		//fmt.Println(items,len(items))
 		//fmt.Println(items[0],items[1],items[2])
-		if len(items) != 2{
-			fmt.Println("lenght not 2")
+		if len(items) != 3{
+			fmt.Println(line + " lenght not == 2")
 			continue
 		}
 		mutex.Lock()
-		v:=strings.Trim(items[1],"\r\n")
+		var info StockInfo
+		info.Code = trim(items[0])
+		info.Name = trim(items[1])
+
+		v:=trim(items[2])
 		v1, err := strconv.ParseFloat(v, 32)
 		if err!= nil{
 			fmt.Println(err)
 			continue
 		}
-		stocks[items[0]] = float32(v1)
-		fmt.Println("key=",items[0],"value=",float32(v1))
+		info.Value = v1
+		stocks[info.Code] = info
 		mutex.Unlock()
-		//fmt.Println(line)
 	}
 	fmt.Println("items count=",len(stocks))
 	return nil
 }
 type StockResult struct{
+	Value float64 `json:"value"`
+	Name string `json:"name"`
 	Code string `json:"code"`
-	Value float32 `json:"value"`
 	Error int `json:"error"`
 	Message string `json:"message"`
 }
@@ -64,14 +83,17 @@ func queryStock(c *gin.Context)  {
 	if value, ok := stocks[id]; ok {
 		c.JSON(200,&StockResult{
 			Code:id,
-			Value:value,
+			Value:value.Value,
+			Name:value.Name,
+
 			Error:0,
 			Message:"",
 		})
 	}else{
 		c.JSON(200,&StockResult{
 			Code:id,
-			Value:value,
+			Value:value.Value,
+			Name:value.Name,
 			Error:1,
 			Message:"not exist",
 		})
