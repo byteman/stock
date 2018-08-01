@@ -93,6 +93,8 @@ type StockResult struct{
 	Value float64 `json:"value"`
 	Name string `json:"name"`
 	Code string `json:"code"`
+	Track float64 `json:"track"` //短线跟踪
+	Step float64 `json:"step"` //峰值系数
 	Error int `json:"error"`
 	Message string `json:"message"`
 }
@@ -105,7 +107,8 @@ func queryStock(c *gin.Context)  {
 			Code:id,
 			Value:value.Value,
 			Name:value.Name,
-
+			Track:value.Track,
+			Step:value.Step,
 			Error:0,
 			Message:"",
 		})
@@ -114,6 +117,8 @@ func queryStock(c *gin.Context)  {
 			Code:id,
 			Value:value.Value,
 			Name:value.Name,
+			Track:value.Track,
+			Step:value.Step,
 			Error:1,
 			Message:"not exist",
 		})
