@@ -17,9 +17,11 @@ import (
 var mutex sync.Mutex
 
 type StockInfo struct{
-	Value float64 `json:"value"`
-	Name string `json:"name"`
-	Code string `json:"code"`
+	Value float64 `json:"value"` //黑马系数
+	Name string `json:"name"` //股票名称
+	Code string `json:"code"` //股票代码
+	Track float64 `json:"track"` //短线跟踪
+	Step float64 `json:"step"` //峰值系数
 }
 var stocks map[string]StockInfo
 
@@ -30,6 +32,14 @@ func trim(str string)string  {
 
 	str = strings.Replace(str, "\r", "", -1)
 	return str
+}
+func toFloat(str string)(v float64,err error )  {
+	tmp:= trim(str)
+	v1, err := strconv.ParseFloat(tmp, 32)
+	if err!= nil{
+		return 0,err
+	}
+	return v1,err
 }
 func loadStock()error  {
 	f, err := os.Open("appstockdata.txt")
@@ -47,10 +57,10 @@ func loadStock()error  {
 			fmt.Println(err)
 			break
 		}
-		items:=strings.SplitN(line,"  ",3)
+		items:=strings.SplitN(line,",",5)
 		//fmt.Println(items,len(items))
 		//fmt.Println(items[0],items[1],items[2])
-		if len(items) != 3{
+		if len(items) != 5{
 			fmt.Println(line + " lenght not == 2")
 			continue
 		}
@@ -58,14 +68,21 @@ func loadStock()error  {
 		var info StockInfo
 		info.Code = trim(items[0])
 		info.Name = trim(items[1])
-
-		v:=trim(items[2])
-		v1, err := strconv.ParseFloat(v, 32)
+		info.Value, err = toFloat(items[2])
 		if err!= nil{
-			fmt.Println(err)
+			fmt.Println("value convert error ",err)
 			continue
 		}
-		info.Value = v1
+		info.Track, err = toFloat(items[3])
+		if err!= nil{
+			fmt.Println("track convert error " , err)
+			continue
+		}
+		info.Step, err = toFloat(items[4])
+		if err!= nil{
+			fmt.Println("step convert error" ,err)
+			continue
+		}
 		stocks[info.Code] = info
 		mutex.Unlock()
 	}
