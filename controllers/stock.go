@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"github.com/axgle/mahonia"
 	"io/ioutil"
+	"sort"
 )
 
 var mutex sync.Mutex
@@ -24,6 +25,21 @@ type StockInfo struct{
 	Step float64 `json:"step"` //峰值系数
 }
 var stocks map[string]StockInfo
+
+type StockSlice []StockInfo
+
+var stockArr StockSlice
+var stockIndex = 0
+func (a StockSlice) Len() int {         // 重写 Len() 方法
+	return len(a)
+}
+func (a StockSlice) Swap(i, j int){     // 重写 Swap() 方法
+	//fmt.Println(i,j)
+	a[i], a[j] = a[j], a[i]
+}
+func (a StockSlice) Less(i, j int) bool {    // 重写 Less() 方法， 从大到小排序
+	return a[j].Value < a[i].Value
+}
 
 func trim(str string)string  {
 	str = strings.Replace(str, " ", "", -1)
@@ -84,9 +100,19 @@ func loadStock()error  {
 			continue
 		}
 		stocks[info.Code] = info
+		stockArr = append(stockArr,info)
 		mutex.Unlock()
 	}
+
+	sort.Sort(stockArr)    // 按照 Age 的逆序排序
+	fmt.Println(stockArr)
+	index := sort.Search(len(stockArr), func(i int) bool { return stockArr[i].Value < 100 })
+	if index < len(stockArr) {
+		stockIndex = index
+	}
+	fmt.Println("stockIndex=",stockIndex)
 	fmt.Println("items count=",len(stocks))
+	fmt.Println(stockArr)
 	return nil
 }
 type StockResult struct{
@@ -98,7 +124,11 @@ type StockResult struct{
 	Error int `json:"error"`
 	Message string `json:"message"`
 }
-func queryStock(c *gin.Context)  {
+func advanceQueryStock(c *gin.Context){
+	//score:=DefaultQueryInt(c,"score",100)
+	c.IndentedJSON(200,stockArr[:stockIndex])
+}
+func basicQueryStock(c *gin.Context)  {
 	id:=c.Param("id")
 
 
