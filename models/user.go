@@ -3,13 +3,10 @@ package models
 //组织机构
 type User struct {
 	ID  int `json:"id" gorm:"primary_key"` //用户编号
-	ProjectID int `json:"-"`//真正在数据库中存在的外键值
 	Name string `json:"username" gorm:"not null;unique"` //用户名
 	PassWord string `json:"password" gorm:"not null"` //密码
-	OrgID int `json:"org_id" gorm:"not null"` //组织的级别.
-	Region string `json:"region"` //用户账户所在的行政区域
-	AdCode string `json:"ad_code"`
-	Group int `json:"-" gorm:"not null"` //组织的组.
+	Phone string `json:"phone" gorm:"not null"` //手机号
+
 }
 //根据用户名获取用户信息.
 func GetUserByName(name string)(u *User,e error)  {
@@ -20,20 +17,6 @@ func GetUserByName(name string)(u *User,e error)  {
 	return u,nil
 }
 
-//根据用户名获取用户信息.
-func GetUserByOrgId(oid int)(us []*User,e error)  {
-
-
-	users := make([]*User, 0, 5)
-
-
-	if err:=g.Where("org_id=?",oid).Find(&users).Error;err!=nil{
-		return nil,err
-	}
-	return users,nil
-
-
-}
 
 
 func AddUser(u *User) error{
