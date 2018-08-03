@@ -65,6 +65,8 @@ func loadStock()error  {
 	}
 	defer f.Close()
 	stocks = make(map[string]StockInfo)
+	stockArr=nil
+	stockIndex = 0
 	rd := bufio.NewReader(f)
 	for {
 		line, err := rd.ReadString('\n') //以'\n'为结束符读入一行
