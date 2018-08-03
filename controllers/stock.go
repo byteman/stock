@@ -73,11 +73,11 @@ func loadStock()error  {
 			fmt.Println(err)
 			break
 		}
-		items:=strings.SplitN(line,",",5)
+		items:=strings.Split(line,",")
 		//fmt.Println(items,len(items))
 		//fmt.Println(items[0],items[1],items[2])
-		if len(items) != 5{
-			fmt.Println(line + " lenght not == 2")
+		if len(items) < 7{
+			fmt.Println(line + " lenght < 7")
 			continue
 		}
 		mutex.Lock()
@@ -105,14 +105,14 @@ func loadStock()error  {
 	}
 
 	sort.Sort(stockArr)    // 按照 Age 的逆序排序
-	fmt.Println(stockArr)
+	//fmt.Println(stockArr)
 	index := sort.Search(len(stockArr), func(i int) bool { return stockArr[i].Value < 100 })
 	if index < len(stockArr) {
 		stockIndex = index
 	}
 	fmt.Println("stockIndex=",stockIndex)
 	fmt.Println("items count=",len(stocks))
-	fmt.Println(stockArr)
+	//fmt.Println(stockArr)
 	return nil
 }
 type StockResult struct{
