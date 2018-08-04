@@ -50,6 +50,7 @@ func RouteRegister(e *gin.Engine)  {
 	e.GET("/stock/advance",advanceQueryStock)
 	e.POST("/upload",uploadFile)
 	e.POST("/stock/users",AddUsers)
+	e.GET("/stock/users",GetUsers)
 	auth := e.Group("/api/v1")
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{

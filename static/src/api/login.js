@@ -18,7 +18,13 @@ export function getInfo(token) {
     params: { token }
   })
 }
-
+export function getUsers(token) {
+  return request({
+    url: 'stock/users',
+    method: 'get',
+    params: { token }
+  })
+}
 export function logout() {
   return request({
     url: 'api/v1/user/logout',

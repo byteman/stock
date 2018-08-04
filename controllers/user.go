@@ -28,7 +28,13 @@ import (
  * @apiError 401  未授权
  */
 func GetUsers(c *gin.Context)  {
+	users:=make([]models.User,0)
 
+	if models.GetUsers(&users) != nil{
+		ErrorResponse(c, 401, "can not get users")
+		return
+	}
+	SuccessQueryResponse(c,users)
 }
 
 /**
@@ -60,7 +66,7 @@ func AddUsers(c *gin.Context)  {
 		ErrorInvalidParam(c,err)
 	}
 
-	err= models.DefaultAdd(&user)
+	err= models.AddUser(&user)
 	if err!=nil{
 		ErrorDB(c,err)
 		return
