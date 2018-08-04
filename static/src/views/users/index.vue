@@ -6,42 +6,45 @@
     <el-table-column
       prop="id"
       label="用户编号"
-      width="180">
+      width="80">
     </el-table-column>
     <el-table-column
       prop="reg_date"
       :formatter="formatDateTime"
       label="注册日期"
-      width="180">
+      width="100">
     </el-table-column>
  <el-table-column
       prop="pay_date"
       label="服务开始启用日期"
-      width="180">
+      width="200">
     </el-table-column>
     
 
     <el-table-column
       prop="username"
       label="姓名"
-      width="180">
+      width="100">
     </el-table-column>
      <el-table-column
       prop="password"
       label="密码"
-      width="180">
+      width="100">
     </el-table-column>
     <el-table-column
       prop="phone"
+       width="120"
       label="电话号码">
     </el-table-column>
      <el-table-column
       prop="pay_type"
+       width="120"
       :formatter="formatPayType"
       label="付费服务类型">
     </el-table-column>
 
      <el-table-column
+      
       label="操作">
       <template slot-scope="scope">
         <el-button
