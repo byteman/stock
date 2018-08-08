@@ -42,6 +42,7 @@ func RouteRegister(e *gin.Engine)  {
 
 		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
 		TimeFunc: time.Now,
+		PayloadFunc: MyPayLoadFunc,
 	}
 	e.POST("/login", authMiddleware.LoginHandler)
 	e.Static("/static","./static")
