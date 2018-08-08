@@ -23,6 +23,7 @@ type StockInfo struct{
 	Code string `json:"code"` //股票代码
 	Track float64 `json:"track"` //短线跟踪
 	Step float64 `json:"step"` //峰值系数
+	RO float64 `json:"ro"` //ROCI基本盘系数
 }
 var stocks map[string]StockInfo
 
@@ -78,8 +79,8 @@ func loadStock()error  {
 		items:=strings.Split(line,",")
 		//fmt.Println(items,len(items))
 		//fmt.Println(items[0],items[1],items[2])
-		if len(items) < 7{
-			fmt.Println(line + " lenght < 7")
+		if len(items) < 8{
+			fmt.Println(line + " length < 8")
 			continue
 		}
 		mutex.Lock()
@@ -97,6 +98,11 @@ func loadStock()error  {
 			continue
 		}
 		info.Step, err = toFloat(items[4])
+		if err!= nil{
+			fmt.Println("step convert error" ,err)
+			continue
+		}
+		info.RO, err = toFloat(items[7])
 		if err!= nil{
 			fmt.Println("step convert error" ,err)
 			continue
@@ -123,6 +129,7 @@ type StockResult struct{
 	Code string `json:"code"`
 	Track float64 `json:"track"` //短线跟踪
 	Step float64 `json:"step"` //峰值系数
+	RO float64 `json:"ro"`
 	Error int `json:"error"`
 	Message string `json:"message"`
 }
@@ -141,6 +148,7 @@ func basicQueryStock(c *gin.Context)  {
 			Name:value.Name,
 			Track:value.Track,
 			Step:value.Step,
+			RO:value.RO,
 			Error:0,
 			Message:"",
 		})
@@ -151,6 +159,7 @@ func basicQueryStock(c *gin.Context)  {
 			Name:value.Name,
 			Track:value.Track,
 			Step:value.Step,
+			RO:value.RO,
 			Error:1,
 			Message:"not exist",
 		})
