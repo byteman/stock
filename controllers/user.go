@@ -124,7 +124,8 @@ func UpdateUser (c *gin.Context)  {
 	}
 
 	user.ID = id
-	DefaultUpdateById(c,id,user)
+	models.UpdateUserLevel(id,user.PayType)
+	//DefaultUpdateById(c,id,user)
 }
 /**
  * @apiDescription 获取指定用户账户.

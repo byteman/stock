@@ -75,8 +75,8 @@ func MyPayLoadFunc(userId string)map[string]interface{}{
 
 	return gin.H{
 		"level":user.PayType,
-		"regts":user.RegDate/1000,
-		"payts":user.PayDate/1000,
+		"regts":user.RegDate,
+		"payts":user.PayDate,
 	}
 }
 func MyAuthorizator(userId string, c *gin.Context)bool  {
