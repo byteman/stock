@@ -122,6 +122,7 @@ func UpdateUser (c *gin.Context)  {
 	if err!=nil{
 		return
 	}
+
 	user.ID = id
 	DefaultUpdateById(c,id,user)
 }

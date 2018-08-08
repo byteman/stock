@@ -49,7 +49,10 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          @click="handleUpdateNormal(scope.$index, scope.row)">升级普通会员</el-button>
+        <el-button
+          size="mini"
+          @click="handleUpdateVip(scope.$index, scope.row)">升级高级会员</el-button>
         <el-button
           size="mini"
           type="danger"
@@ -61,6 +64,9 @@
 
 <script>
 import { getUsers } from '@/api/login'
+import { updateUser } from '@/api/login'
+import { deleteUser } from '@/api/login'
+
 export default {
   data() {
     return {
@@ -68,6 +74,28 @@ export default {
     }
   },
   methods: {
+    handleUpdateNormal(index, row) {
+      console.log(row)
+      var user = {
+        pay_type: 1
+      }
+      updateUser(row.id, user).then(response => {
+        this.fetchData()
+      })
+    },
+    handleUpdateVip(index, row) {
+      var user = {
+        pay_type: 2
+      }
+      updateUser(row.id, user).then(response => {
+        this.fetchData()
+      })
+    },
+    handleDelete(index, row) {
+      deleteUser(row.id).then(response => {
+        this.fetchData()
+      })
+    },
     fetchData() {
       this.listLoading = true
       getUsers().then(response => {

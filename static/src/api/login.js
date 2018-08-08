@@ -25,6 +25,19 @@ export function getUsers(token) {
     params: { token }
   })
 }
+export function updateUser(uid, user) {
+  return request({
+    url: 'stock/user/' + uid,
+    method: 'put',
+    data: user
+  })
+}
+export function deleteUser(uid) {
+  return request({
+    url: 'stock/user/' + uid,
+    method: 'delete'
+  })
+}
 export function logout() {
   return request({
     url: 'api/v1/user/logout',

@@ -66,9 +66,17 @@ func MyAuthenticator(userID string, password string, c *gin.Context) (string, bo
 	return userID, true
 }
 func MyPayLoadFunc(userId string)map[string]interface{}{
+	user,err:=models.GetUserByName(userId)
+	if err!=nil{
+		return gin.H{
+
+		}
+	}
+
 	return gin.H{
-		"level":1,
-		"regts":1560000000,
+		"level":user.PayType,
+		"regts":user.RegDate/1000,
+		"payts":user.PayDate/1000,
 	}
 }
 func MyAuthorizator(userId string, c *gin.Context)bool  {

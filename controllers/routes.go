@@ -52,6 +52,8 @@ func RouteRegister(e *gin.Engine)  {
 	e.POST("/upload",uploadFile)
 	e.POST("/stock/users",AddUsers)
 	e.GET("/stock/users",GetUsers)
+	e.PUT("stock/user/:id",UpdateUser)
+	e.DELETE("/stock/user/:id",RemoveUsers)
 	auth := e.Group("/api/v1")
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{

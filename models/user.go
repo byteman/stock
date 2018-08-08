@@ -10,7 +10,7 @@ type User struct {
 	Phone string `json:"phone" gorm:"not null"` //手机号
 	RegDate int64 `json:"reg_date" gorm:"not null"` //注册时间
 	PayDate int64 `json:"pay_date" gorm:"not null"` //付费时间
-	PayType int  `json:"pay_type" gorm:"not null;default:0"` //用户类型 0:注册用户，无查询功能；1:普通查询功能用户；2:高级查询功能用户。
+	PayType int  `json:"pay_type" gorm:"not null;default:0"` //用户类型 0未注册 1:注册用户，无查询功能；2:普通查询功能用户；3高级查询功能用户。
 
 
 }
@@ -37,6 +37,12 @@ func AddUser(u *User) error{
 }
 func GetUsers(users *[]User)error  {
 	return g.Find(users).Error
+}
+
+func UpdateUserLevel(uid int,level int)error{
+
+	return g.Table("user").Where("id=?",uid).Update("level",level).Error
+
 }
 
 func RemoveUserById(uid int) error {
