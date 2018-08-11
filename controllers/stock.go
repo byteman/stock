@@ -158,8 +158,8 @@ func checkPermission(c *gin.Context,level int)error{
 		}
 		fmt.Printf("payType=%d,level=%d\n",u.PayType,level)
 
-		if  u.PayType < level{
-			return  fmt.Errorf("权限不够")
+		if err:=u.CheckPermission(level);err!=nil{
+			return  err
 		}
 
 

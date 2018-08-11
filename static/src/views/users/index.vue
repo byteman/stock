@@ -16,6 +16,7 @@
     </el-table-column>
  <el-table-column
       prop="pay_date"
+      :formatter="formatDateTime"
       label="服务开始启用日期"
       width="200">
     </el-table-column>
