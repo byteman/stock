@@ -100,7 +100,7 @@ func GetUsers(users *[]User)error  {
 func UpdateUserLevel(uid int,level int)error{
 
 
-	return g.Table("users").Where("id=?",uid).Update(User{PayType:level}).Error
+	return g.Table("users").Where("id=?",uid).Update(User{PayType:level,PayDate:time.Now().Unix()}).Error
 
 }
 func UpdateUserPayTime(uid int)error{

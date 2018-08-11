@@ -16,7 +16,7 @@
     </el-table-column>
  <el-table-column
       prop="pay_date"
-      :formatter="formatDateTime"
+      :formatter="formatPayDateTime"
       label="服务开始启用日期"
       width="200">
     </el-table-column>
@@ -130,6 +130,9 @@ export default {
     },
     formatDateTime(row, column, cellValue, index) {
       return this.formatDatetwo(row.reg_date * 1000)
+    },
+    formatPayDateTime(row, column, cellValue, index) {
+      return this.formatDatetwo(row.pay_date * 1000)
     },
     formatPayType(row, column, cellValue, index) {
       console.log(row, column, cellValue, index)
