@@ -13,6 +13,8 @@ import (
 	"github.com/axgle/mahonia"
 	"io/ioutil"
 	"sort"
+	"gopkg.in/dgrijalva/jwt-go.v3"
+	"stock/models"
 )
 
 var mutex sync.Mutex
@@ -133,11 +135,68 @@ type StockResult struct{
 	Error int `json:"error"`
 	Message string `json:"message"`
 }
+var hmacSampleSecret = []byte("secret key")
+
+func checkPermission(c *gin.Context,level int)error{
+	tokenString := c.GetHeader("token")
+	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		return hmacSampleSecret, nil
+	})
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		username:=claims["user"].(string)
+
+		u,err:=models.GetUserByName(username)
+		if err!=nil{
+			return  err
+		}
+		if level < u.PayType {
+			return  fmt.Errorf("权限不够")
+		}
+		if u.IsExpire(){
+			return fmt.Errorf("账号已经过期")
+		}
+
+
+
+	} else {
+		return fmt.Errorf("无法获取用户信息")
+	}
+	return nil
+}
 func advanceQueryStock(c *gin.Context){
 	//score:=DefaultQueryInt(c,"score",100)
-	c.IndentedJSON(200,stockArr[:stockIndex])
+	if err:=checkPermission(c,1);err!=nil{
+		SuccessQueryResponse(c,gin.H{
+			"error":1,
+			"message":fmt.Sprintf("%s",err),
+		})
+		return
+	}
+	c.IndentedJSON(200,gin.H{
+		"error":0,
+		"message":"ok",
+		"data":stockArr[:stockIndex],
+	})
 }
+//0 普通注册用户 过期和未过期 	过期的不能做基本查询 未过期可以每天一次基本查询
+//1 普通充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本查询
+//2 高级充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本和高级查询
 func basicQueryStock(c *gin.Context)  {
+
+	if err:=checkPermission(c,1);err!=nil{
+		SuccessQueryResponse(c,gin.H{
+			"error":1,
+			"message":fmt.Sprintf("%s",err),
+		})
+		return
+	}
 	id:=c.Param("id")
 
 

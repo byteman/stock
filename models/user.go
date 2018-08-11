@@ -14,6 +14,10 @@ type User struct {
 
 
 }
+//判断用户是否过期
+func (u *User)IsExpire()bool{
+	return false
+}
 //根据用户名获取用户信息.
 func GetUserByName(name string)(u *User,e error)  {
 	 u=&User{}
@@ -41,7 +45,7 @@ func GetUsers(users *[]User)error  {
 
 func UpdateUserLevel(uid int,level int)error{
 
-	return g.Table("user").Where("id=?",uid).Update("level",level).Error
+	return g.Table("users").Where("id=?",uid).Update("pay_type",level).Error
 
 }
 
