@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 	"fmt"
+	"github.com/jinzhu/now"
 )
 
 //组织机构
@@ -19,13 +20,14 @@ type User struct {
 }
 //判断普通用户是否过期
 func (u *User)NormalIsExpire()bool{
-	now:=time.Now().Unix()
-	return now >u.RegDate
+	nowt:=time.Now().Unix()
+
+	return nowt >(u.RegDate+2*24*3600)
 }
 //判断注册用户是否过期
 func (u *User)VipIsExpire()bool{
-	now:=time.Now().Unix()
-	return now >u.PayDate
+	nowt:=time.Now().Unix()
+	return nowt >(u.PayDate+365*24*3600)
 }
 //0 普通注册用户 过期和未过期 	过期的不能做基本查询 未过期可以每天一次基本查询,普通用户的过期时间2天
 //1 普通充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本查询,充值会员1年有效期
