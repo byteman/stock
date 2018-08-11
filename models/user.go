@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"time"
+	"fmt"
+)
 
 //组织机构
 type User struct {
@@ -11,12 +14,63 @@ type User struct {
 	RegDate int64 `json:"reg_date" gorm:"not null"` //注册时间
 	PayDate int64 `json:"pay_date" gorm:"not null"` //付费时间
 	PayType int  `json:"pay_type" gorm:"not null;default:0"` //用户类型 0未注册 1:注册用户，无查询功能；2:普通查询功能用户；3高级查询功能用户。
-
+	ExpireDate int64 `json:"expire_date" gorm:"not null"` //过期时间.
 
 }
-//判断用户是否过期
-func (u *User)IsExpire()bool{
-	return false
+//判断普通用户是否过期
+func (u *User)NormalIsExpire()bool{
+	now:=time.Now().Unix()
+	return now >u.RegDate
+}
+//判断注册用户是否过期
+func (u *User)VipIsExpire()bool{
+	now:=time.Now().Unix()
+	return now >u.PayDate
+}
+//0 普通注册用户 过期和未过期 	过期的不能做基本查询 未过期可以每天一次基本查询,普通用户的过期时间2天
+//1 普通充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本查询,充值会员1年有效期
+//2 高级充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本和高级查询,充值会员1年有效期
+func (u* User)CheckPermission(funcId int)error{
+	if u.PayType == 0{
+
+		switch funcId{
+		case 2:
+			//普通注册用户绝对不能使用高级功能
+			return fmt.Errorf("权限不够请充值为高级会员")
+		case 1:
+			//普通用户访问普通查询，判断是否已经过期
+			if u.NormalIsExpire(){
+				return fmt.Errorf("试用账号已经过期,请充值")
+			}
+		default:
+			return fmt.Errorf("系统内部错误")
+		}
+
+	}else if u.PayType == 1{
+		//普通付费账号
+		switch funcId{
+		case 2:
+			//普通付费用户绝对不能使用高级功能
+			return fmt.Errorf("权限不够请充值为高级会员")
+		case 1:
+			//普通用户访问普通查询，判断是否已经过期
+			if u.VipIsExpire(){
+				return fmt.Errorf("账号已经过期,请充值")
+			}
+		default:
+			return fmt.Errorf("系统内部错误")
+		}
+	}else if u.PayType == 2{
+
+			//高级账号只需要判断是否已过期.
+			if u.VipIsExpire(){
+				return fmt.Errorf("账号已经过期,请充值")
+			}
+
+
+	}
+
+	return nil
 }
 //根据用户名获取用户信息.
 func GetUserByName(name string)(u *User,e error)  {
@@ -45,10 +99,16 @@ func GetUsers(users *[]User)error  {
 
 func UpdateUserLevel(uid int,level int)error{
 
-	return g.Table("users").Where("id=?",uid).Update("pay_type",level).Error
+
+	return g.Table("users").Where("id=?",uid).Update(User{PayType:level}).Error
 
 }
+func UpdateUserPayTime(uid int)error{
 
+
+	return g.Table("users").Where("id=?",uid).Update(User{PayDate:time.Now().Unix()}).Error
+
+}
 func RemoveUserById(uid int) error {
 	if err := g.Where("id=?", uid).Delete(User{}).Error; err != nil {
 		return err

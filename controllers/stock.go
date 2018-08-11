@@ -150,18 +150,18 @@ func checkPermission(c *gin.Context,level int)error{
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		username:=claims["user"].(string)
+		username:=claims["id"].(string)
 
 		u,err:=models.GetUserByName(username)
 		if err!=nil{
 			return  err
 		}
-		if level < u.PayType {
+		fmt.Printf("payType=%d,level=%d\n",u.PayType,level)
+
+		if  u.PayType < level{
 			return  fmt.Errorf("权限不够")
 		}
-		if u.IsExpire(){
-			return fmt.Errorf("账号已经过期")
-		}
+
 
 
 
@@ -185,9 +185,7 @@ func advanceQueryStock(c *gin.Context){
 		"data":stockArr[:stockIndex],
 	})
 }
-//0 普通注册用户 过期和未过期 	过期的不能做基本查询 未过期可以每天一次基本查询
-//1 普通充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本查询
-//2 高级充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本和高级查询
+
 func basicQueryStock(c *gin.Context)  {
 
 	if err:=checkPermission(c,1);err!=nil{
