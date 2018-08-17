@@ -58,6 +58,6 @@ func AddLogByName(user string , action int) error {
 	return g.Create(log).Error
 }
 func GetLogs(logs *[]Log)(err error)  {
-	err = g.Model(Log{}).Preload("User").Find(logs).Error
+	err = g.Model(Log{}).Preload("User").Order("id desc").Find(logs).Error
 	return
 }
