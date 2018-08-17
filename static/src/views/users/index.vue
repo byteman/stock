@@ -78,7 +78,7 @@ export default {
     handleUpdateNormal(index, row) {
       console.log(row)
       var user = {
-        pay_type: 1
+        pay_type: 2
       }
       updateUser(row.id, user).then(response => {
         this.fetchData()
@@ -86,7 +86,7 @@ export default {
     },
     handleUpdateVip(index, row) {
       var user = {
-        pay_type: 2
+        pay_type: 3
       }
       updateUser(row.id, user).then(response => {
         this.fetchData()
