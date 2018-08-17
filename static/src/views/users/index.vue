@@ -12,13 +12,13 @@
       prop="reg_date"
       :formatter="formatDateTime"
       label="注册日期"
-      width="100">
+      width="150">
     </el-table-column>
  <el-table-column
       prop="pay_date"
       :formatter="formatPayDateTime"
       label="付费开始日期"
-      width="200">
+      width="150">
     </el-table-column>
     
 
@@ -117,7 +117,7 @@ export default {
         'q+': Math.floor((d.getMonth() + 3) / 3), // quarter
         'S': d.getMilliseconds() // millisecond
       }
-      var format = 'yyyy-MM-dd'
+      var format = 'yyyy-MM-dd hh:mm'
       if (/(y+)/.test(format)) {
         format = format.replace(RegExp.$1, (d.getFullYear() + '').substr(4 - RegExp.$1.length))
       }
