@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 	"fmt"
-	"github.com/jinzhu/now"
 )
 
 //组织机构
@@ -40,9 +39,20 @@ func (u* User)CheckPermission(funcId int)error{
 			//普通注册用户绝对不能使用高级功能
 			return fmt.Errorf("权限不够请充值为高级会员")
 		case 1:
-			//普通用户访问普通查询，判断是否已经过期
+			//普通用户访问普通查询，判断是否已经过期,过期后，每天只能试用1次
 			if u.NormalIsExpire(){
-				return fmt.Errorf("试用账号已经过期,请充值")
+				var count = 0
+				var err error
+				if count,err=GetOperCountOfToday(u.ID,funcId);err!=nil{
+					return fmt.Errorf("试用账号已经过期,请充值")
+				}
+				fmt.Println("count=",count)
+				if count > 1{
+
+					return fmt.Errorf("试用账号已经过期,每天只能试用一次")
+				}
+				return nil
+
 			}
 		default:
 			return fmt.Errorf("系统内部错误")

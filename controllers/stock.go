@@ -137,8 +137,9 @@ type StockResult struct{
 }
 var hmacSampleSecret = []byte("secret key")
 
-func checkPermission(c *gin.Context,level int)error{
+func checkPermission(c *gin.Context,level int)(err error){
 	tokenString := c.GetHeader("token")
+	var user *models.User = nil
 	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -152,19 +153,19 @@ func checkPermission(c *gin.Context,level int)error{
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		username:=claims["id"].(string)
 
-		u,err:=models.GetUserByName(username)
+		user,err=models.GetUserByName(username)
 		if err!=nil{
 			return  err
 		}
-		fmt.Printf("payType=%d,level=%d\n",u.PayType,level)
 
-		if err:=u.CheckPermission(level);err!=nil{
+		fmt.Printf("payType=%d,level=%d\n",user.PayType,level)
+
+		if err:=user.CheckPermission(level);err!=nil{
 			return  err
 		}
-
-
-
-
+		if user!=nil{
+			models.AddLog(user.ID,level)
+		}
 	} else {
 		return fmt.Errorf("无法获取用户信息")
 	}
@@ -172,13 +173,15 @@ func checkPermission(c *gin.Context,level int)error{
 }
 func advanceQueryStock(c *gin.Context){
 	//score:=DefaultQueryInt(c,"score",100)
-	if err:=checkPermission(c,1);err!=nil{
+
+	if err:=checkPermission(c,2);err!=nil{
 		SuccessQueryResponse(c,gin.H{
 			"error":1,
 			"message":fmt.Sprintf("%s",err),
 		})
 		return
 	}
+
 	c.IndentedJSON(200,gin.H{
 		"error":0,
 		"message":"ok",
@@ -188,6 +191,7 @@ func advanceQueryStock(c *gin.Context){
 
 func basicQueryStock(c *gin.Context)  {
 
+
 	if err:=checkPermission(c,1);err!=nil{
 		SuccessQueryResponse(c,gin.H{
 			"error":1,
@@ -195,6 +199,7 @@ func basicQueryStock(c *gin.Context)  {
 		})
 		return
 	}
+
 	id:=c.Param("id")
 
 
