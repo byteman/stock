@@ -61,6 +61,18 @@ export const constantRouterMap = [
     ]
   },
   {
+    path: '/logs',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'logs',
+        component: () => import('@/views/logs/index'),
+        meta: { title: '日志查询', icon: 'tree' }
+      }
+    ]
+  },
+  {
     path: '/app',
     component: Layout,
     children: [

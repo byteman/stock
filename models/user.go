@@ -52,8 +52,8 @@ func (u* User)CheckPermission(funcId int)error{
 				if count,err=GetOperCountOfToday(u.ID,funcId);err!=nil{
 					return fmt.Errorf("试用账号已经过期,请充值")
 				}
-				fmt.Println("count=",count)
-				if count > 1{
+				fmt.Printf("%s call count=%d",u.Name,count)
+				if count > 0{
 
 					return fmt.Errorf("试用账号已经过期,每天只能试用一次")
 				}

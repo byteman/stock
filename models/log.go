@@ -12,6 +12,7 @@ type Log struct{
 	ID  int `json:"id" gorm:"primary_key"` //操作日志编号
 	//User User
 	UserID int `json:"user_id"` //操作用户的id
+	User User `json:"user"`
 	Action int `json:"action"` //行为类型 1普通查询 2高级查询
 	LogDate int64 `json:"log_date"` //时间.
 
@@ -36,7 +37,7 @@ func GetOperCountOfToday(uid int, action int) (count int,err error) {
 	if err:=g.Model(Log{}).Select("count(id) as total").
 		Where("user_id=?",uid).
 		Where("action=?",action).
-		Where("log_data > ? and log_data < ?",now.BeginningOfDay().Unix(), now.EndOfDay().Unix()).Scan(&result).Error;err!=nil{
+		Where("log_date > ? and log_date < ?",now.BeginningOfDay().Unix(), now.EndOfDay().Unix()).Scan(&result).Error;err!=nil{
 			return 0,err
 	}
 	return result.Total,nil
@@ -55,4 +56,8 @@ func AddLogByName(user string , action int) error {
 	}
 
 	return g.Create(log).Error
+}
+func GetLogs(logs *[]Log)(err error)  {
+	err = g.Model(Log{}).Preload("User").Find(logs).Error
+	return
 }

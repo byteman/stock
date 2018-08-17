@@ -34,10 +34,10 @@ func GetUsers(c *gin.Context)  {
 		ErrorResponse(c, 401, "can not get users")
 		return
 	}
-	for _,user:=range users{
+	for index,user:=range users{
 		if user.PayType == 0 && user.NormalIsExpire(){
 			//试用用户，并且过期了，就变成普通账号.
-			user.PayType = 1
+			users[index].PayType = 1
 		}
 	}
 	SuccessQueryResponse(c,users)

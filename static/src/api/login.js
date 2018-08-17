@@ -44,3 +44,11 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function getLogs(token) {
+  return request({
+    url: 'stock/logs',
+    method: 'get',
+    params: { token }
+  })
+}

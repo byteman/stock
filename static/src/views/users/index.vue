@@ -17,7 +17,7 @@
  <el-table-column
       prop="pay_date"
       :formatter="formatPayDateTime"
-      label="服务开始启用日期"
+      label="付费开始日期"
       width="200">
     </el-table-column>
     
@@ -132,6 +132,9 @@ export default {
       return this.formatDatetwo(row.reg_date * 1000)
     },
     formatPayDateTime(row, column, cellValue, index) {
+      if (row.pay_date < 1000) {
+        return '未开始'
+      }
       return this.formatDatetwo(row.pay_date * 1000)
     },
     formatPayType(row, column, cellValue, index) {
