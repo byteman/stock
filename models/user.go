@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+const (
+	UserTrail = 0
+	UserExpire = 1
+	VipNormal=2
+	VipAdvance=3
+)
 //组织机构
 type User struct {
 	ID  int `json:"id" gorm:"primary_key"` //用户编号
@@ -13,7 +19,7 @@ type User struct {
 	Phone string `json:"phone" gorm:"not null"` //手机号
 	RegDate int64 `json:"reg_date" gorm:"not null"` //注册时间
 	PayDate int64 `json:"pay_date" gorm:"not null"` //付费时间
-	PayType int  `json:"pay_type" gorm:"not null;default:0"` //用户类型 0未注册 1:注册用户，无查询功能；2:普通查询功能用户；3高级查询功能用户。
+	PayType int  `json:"pay_type" gorm:"not null;default:0"` //用户类型 0:试用注册 1:注册用户，无查询功能；2:普通查询功能用户；3高级查询功能用户。
 	ExpireDate int64 `json:"expire_date" gorm:"not null;default:0"` //过期时间.
 
 }
@@ -32,7 +38,7 @@ func (u *User)VipIsExpire()bool{
 //1 普通充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本查询,充值会员1年有效期
 //2 高级充值会员 有过期和未过期 过期的不能做基本查询 未过期可以无限基本和高级查询,充值会员1年有效期
 func (u* User)CheckPermission(funcId int)error{
-	if u.PayType == 0{
+	if u.PayType == UserTrail{
 
 		switch funcId{
 		case 2:
@@ -58,7 +64,7 @@ func (u* User)CheckPermission(funcId int)error{
 			return fmt.Errorf("系统内部错误")
 		}
 
-	}else if u.PayType == 1{
+	}else if u.PayType == VipNormal{
 		//普通付费账号
 		switch funcId{
 		case 2:
@@ -72,7 +78,7 @@ func (u* User)CheckPermission(funcId int)error{
 		default:
 			return fmt.Errorf("系统内部错误")
 		}
-	}else if u.PayType == 2{
+	}else if u.PayType == VipAdvance{
 
 			//高级账号只需要判断是否已过期.
 			if u.VipIsExpire(){

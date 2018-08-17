@@ -138,10 +138,12 @@ export default {
       console.log(row, column, cellValue, index)
 
       if (row.pay_type === 0) {
-        return '普通用户'
+        return '试用用户'
       } else if (row.pay_type === 1) {
-        return '普通付费用户'
+        return '普通用户'
       } else if (row.pay_type === 2) {
+        return '普通付费用户'
+      } else if (row.pay_type === 3) {
         return '高级付费用户'
       }
     }
