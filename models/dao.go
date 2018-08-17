@@ -2,6 +2,7 @@ package models
 
 import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
 	"fmt"
 	"stock/common"
@@ -15,7 +16,7 @@ var (
 )
 
 func init()  {
-	tables=append(tables,new(User),
+	tables=append(tables,new(User),new(Log),
 		)
 
 }
@@ -37,17 +38,26 @@ var mylog MyLogger
 func (logger MyLogger) Print(values ...interface{}) {
 	seelog.Debug(values)
 }
-func ConnectDB(host string, port int,database string, user string, pass string,debug bool,sync bool) (err error) {
-	dbConnString := fmt.Sprintf("stock.db3")
+func ConnectDB(engine string,host string, port int,database string, user string, pass string,debug bool,sync bool) (err error) {
+
+	var dbConnString = fmt.Sprintf("%s:%s@tcp(%v:%d)/%s?charset=utf8&parseTime=True", user,pass, host,port,database)
+	if engine == "mysql"{
+		dbConnString = fmt.Sprintf("%s:%s@tcp(%v:%d)/%s?charset=utf8&parseTime=True", user,pass, host,port,database)
+	}else if engine=="postgres" {
+		dbConnString = fmt.Sprintf("host=%v port=%d user=%s dbname=%s password=%s",host,port,user,database,pass)
+	}else if engine=="sqlite3"{
+		dbConnString = fmt.Sprintf("%s.db3",database)
+	}
 
 	fmt.Println(dbConnString)
 
 	//db, err := gorm.Open("mysql", "user:password@/dbname?charset=utf8&parseTime=True&loc=Local")
-	db, err := gorm.Open("sqlite3", dbConnString)
+	db, err := gorm.Open(engine, dbConnString)
 	if err !=nil{
+		panic("open database failed!!")
 		return err
 	}
-	fmt.Println("connect ok")
+	fmt.Println("database connect ok")
 	if debug == true{
 		g = db.Debug()
 		g.SetLogger(mylog)
@@ -63,6 +73,7 @@ func ConnectDB(host string, port int,database string, user string, pass string,d
 	return err
 }
 type DataBase struct {
+	Engine string `ini:"engine"`
 	Host string `ini:"host"`
 	Port int `ini:"port"`
 	Db string `ini:"db"`
@@ -74,6 +85,7 @@ type DataBase struct {
 
 func InitDao(ctx *common.AppContext)error  {
 	db:=DataBase{
+		Engine:"mysql",
 		Host:"localhost",
 		Port:3306,
 		Db:"mine",
@@ -91,7 +103,7 @@ func InitDao(ctx *common.AppContext)error  {
 		}
 	}
 	//db.Debug = true
-	err=ConnectDB(db.Host,db.Port,db.Db,db.UserName,db.PassWord,db.Debug,db.Sync)
+	err=ConnectDB(db.Engine,db.Host,db.Port,db.Db,db.UserName,db.PassWord,db.Debug,db.Sync)
 	if err!=nil{
 		seelog.Critical("Connect database failed %v",err)
 	}
