@@ -119,8 +119,7 @@ func GetUsers(users *[]User)error  {
 //添加一条登录日志，更新最后登录时间和递增登录次数
 func AddLoginLog(user* User)error{
 
-	return g.Model(User{}).Update(User{
-			ID:user.ID,
+	return g.Model(User{}).Where("id=?",user.ID).Update(User{
 			LoginDate:time.Now().Unix(),
 			LoginCount:user.LoginCount+1,
 			}).Error

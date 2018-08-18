@@ -251,9 +251,13 @@ func uploadFile(c *gin.Context)  {
 	file, _ := c.FormFile("file")
 	fmt.Println(file.Filename)
 
-	c.SaveUploadedFile(file,"appstockdata.txt")
-	convGbk2Utf8("appstockdata.txt")
-	loadStock()
+	c.SaveUploadedFile(file,file.Filename)
+	convGbk2Utf8(file.Filename)
+
+	if file.Filename == "appstockdata.txt"{
+		loadStock()
+	}
+
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
 func init()  {

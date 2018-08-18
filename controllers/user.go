@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"stock/models"
+	"io/ioutil"
 )
 
 
@@ -41,6 +42,17 @@ func GetUsers(c *gin.Context)  {
 		}
 	}
 	SuccessQueryResponse(c,users)
+}
+
+func GetHelp(c *gin.Context)  {
+	msg,err:=ioutil.ReadFile("help.txt")
+	if err!=nil{
+		ErrorResponse(c,404,"read file failed %v",err)
+		return
+	}
+	SuccessQueryResponse(c,gin.H{
+		"data":msg,
+	})
 }
 
 /**
