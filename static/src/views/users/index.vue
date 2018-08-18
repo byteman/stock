@@ -12,36 +12,47 @@
       prop="reg_date"
       :formatter="formatDateTime"
       label="注册日期"
-      width="150">
+      width="100">
     </el-table-column>
  <el-table-column
       prop="pay_date"
       :formatter="formatPayDateTime"
       label="付费开始日期"
-      width="150">
+      width="100">
     </el-table-column>
     
 
     <el-table-column
       prop="username"
       label="姓名"
-      width="100">
+      width="80">
     </el-table-column>
      <el-table-column
       prop="password"
       label="密码"
-      width="100">
+      width="80">
     </el-table-column>
     <el-table-column
       prop="phone"
-       width="120"
+       width="100"
       label="电话号码">
     </el-table-column>
      <el-table-column
       prop="pay_type"
-       width="120"
+       width="100"
       :formatter="formatPayType"
       label="付费服务类型">
+    </el-table-column>
+   <el-table-column
+      prop="login_date"
+       width="100"
+      :formatter="formatLoginDateTime"
+      label="登录时间">
+    </el-table-column>
+       <el-table-column
+      prop="login_count"
+       width="100"
+      label="登录次数">
     </el-table-column>
 
      <el-table-column
@@ -50,10 +61,10 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="handleUpdateNormal(scope.$index, scope.row)">升级普通会员</el-button>
+          @click="handleUpdateNormal(scope.$index, scope.row)">普通会员</el-button>
         <el-button
           size="mini"
-          @click="handleUpdateVip(scope.$index, scope.row)">升级高级会员</el-button>
+          @click="handleUpdateVip(scope.$index, scope.row)">高级会员</el-button>
         <el-button
           size="mini"
           type="danger"
@@ -117,7 +128,7 @@ export default {
         'q+': Math.floor((d.getMonth() + 3) / 3), // quarter
         'S': d.getMilliseconds() // millisecond
       }
-      var format = 'yyyy-MM-dd hh:mm'
+      var format = 'yyyy-MM-dd'
       if (/(y+)/.test(format)) {
         format = format.replace(RegExp.$1, (d.getFullYear() + '').substr(4 - RegExp.$1.length))
       }
@@ -130,6 +141,9 @@ export default {
     },
     formatDateTime(row, column, cellValue, index) {
       return this.formatDatetwo(row.reg_date * 1000)
+    },
+    formatLoginDateTime(row, column, cellValue, index) {
+      return this.formatDatetwo(row.login_date * 1000)
     },
     formatPayDateTime(row, column, cellValue, index) {
       if (row.pay_date < 1000) {

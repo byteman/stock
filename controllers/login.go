@@ -63,7 +63,10 @@ func MyAuthenticator(userID string, password string, c *gin.Context) (string, bo
 	}
 
 	//添加一条登录记录
-	models.AddLogByName(userID, 0)
+	if user,err:=models.GetUserByName(userID);err==nil{
+		models.AddLoginLog(user)
+	}
+
 
 	return userID, true
 }

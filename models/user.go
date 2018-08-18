@@ -21,7 +21,9 @@ type User struct {
 	PayDate int64 `json:"pay_date" gorm:"not null"` //付费时间
 	PayType int  `json:"pay_type" gorm:"not null;default:0"` //用户类型 0:试用注册 1:注册用户，无查询功能；2:普通查询功能用户；3高级查询功能用户。
 	ExpireDate int64 `json:"expire_date" gorm:"not null;default:0"` //过期时间.
-
+	LoginDate int64 `json:"login_date" gorm:"not null;default:0"` //最后登录时间
+	QueryCount int `json:"query_count" gorm:"not null;default:0"` //查询时间记录.
+	LoginCount int `json:"login_count" gorm:"not null;default:0"` //记录登录次数.
 }
 //判断普通用户是否过期
 func (u *User)NormalIsExpire()bool{
@@ -114,7 +116,15 @@ func AddUser(u *User) error{
 func GetUsers(users *[]User)error  {
 	return g.Find(users).Error
 }
+//添加一条登录日志，更新最后登录时间和递增登录次数
+func AddLoginLog(user* User)error{
 
+	return g.Model(User{}).Update(User{
+			ID:user.ID,
+			LoginDate:time.Now().Unix(),
+			LoginCount:user.LoginCount+1,
+			}).Error
+}
 func UpdateUserLevel(uid int,level int)error{
 
 
