@@ -251,11 +251,14 @@ func uploadFile(c *gin.Context)  {
 	file, _ := c.FormFile("file")
 	fmt.Println(file.Filename)
 
-	c.SaveUploadedFile(file,file.Filename)
-	convGbk2Utf8(file.Filename)
+
 
 	if file.Filename == "appstockdata.txt"{
+		c.SaveUploadedFile(file,file.Filename)
+		convGbk2Utf8(file.Filename)
 		loadStock()
+	}else if file.Filename == "stockhelp.html"{
+		c.SaveUploadedFile(file,"static/dist/"+file.Filename)
 	}
 
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))

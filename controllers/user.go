@@ -45,13 +45,13 @@ func GetUsers(c *gin.Context)  {
 }
 
 func GetHelp(c *gin.Context)  {
-	msg,err:=ioutil.ReadFile("help.txt")
+	msg,err:=ioutil.ReadFile("stockhelp.txt")
 	if err!=nil{
 		ErrorResponse(c,404,"read file failed %v",err)
 		return
 	}
 	SuccessQueryResponse(c,gin.H{
-		"data":msg,
+		"data":string(msg),
 	})
 }
 
