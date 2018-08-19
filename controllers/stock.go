@@ -138,6 +138,21 @@ func loadStock()error  {
 			fmt.Println("step convert error" ,err)
 			continue
 		}
+		info.PE, err = toFloat(items[8])
+		if err!= nil{
+			fmt.Println("PE convert error" ,err)
+			continue
+		}
+		info.PB, err = toFloat(items[9])
+		if err!= nil{
+			fmt.Println("PB convert error" ,err)
+			continue
+		}
+		info.PEG, err = toFloat(items[10])
+		if err!= nil{
+			fmt.Println("PEG convert error" ,err)
+			continue
+		}
 		stocks[info.Code] = info
 		stockArr = append(stockArr,info)
 		stockArrRO =append(stockArrRO,info)
