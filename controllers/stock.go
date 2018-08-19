@@ -27,12 +27,16 @@ type StockInfo struct{
 	Step float64 `json:"step"` //峰值系数 //5
 	RO float64 `json:"ro"` //ROCI基本盘系数 //8
 	HGT float64 `json:"hgt"` //沪港通. //7
+	PE float64 `json:"pe"` //
+	PB float64 `json:"pb"`
+	PEG float64 `json:"peg"`
 	ShortQuery float64 `json:"short_query"` //短线查询 6列
 }
 var stocks map[string]StockInfo
 
 type StockSlice []StockInfo
 type StockSliceRO []StockInfo
+
 
 var stockArr StockSlice
 var stockArrRO StockSliceRO
@@ -145,6 +149,7 @@ func loadStock()error  {
 
 	sort.Sort(stockArr)    // 按照 黑马系数 的逆序排序
 	sort.Sort(stockArrRO)    // 按照 短线系数 的逆序排序
+	sort.Sort(StockSliceHGT) //按照黑马系数排序
 	//fmt.Println(stockArr)
 	index := sort.Search(len(stockArr), func(i int) bool { return stockArr[i].Value < 100 })
 	if index < len(stockArr) {
