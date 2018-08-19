@@ -20,19 +20,25 @@ import (
 var mutex sync.Mutex
 
 type StockInfo struct{
-	Value float64 `json:"value"` //黑马系数
-	Name string `json:"name"` //股票名称
-	Code string `json:"code"` //股票代码
-	Track float64 `json:"track"` //短线跟踪
-	Step float64 `json:"step"` //峰值系数
-	RO float64 `json:"ro"` //ROCI基本盘系数
+	Value float64 `json:"value"` //黑马系数 //3
+	Name string `json:"name"` //股票名称  //1
+	Code string `json:"code"` //股票代码  //2
+	Track float64 `json:"track"` //短线跟踪=多空 //4
+	Step float64 `json:"step"` //峰值系数 //5
+	RO float64 `json:"ro"` //ROCI基本盘系数 //8
+	HGT float64 `json:"hgt"` //沪港通. //7
+	ShortQuery float64 `json:"short_query"` //短线查询 6列
 }
 var stocks map[string]StockInfo
 
 type StockSlice []StockInfo
+type StockSliceRO []StockInfo
 
 var stockArr StockSlice
+var stockArrRO StockSliceRO
+var StockSliceHGT StockSlice
 var stockIndex = 0
+var stockRoIndex = 0
 func (a StockSlice) Len() int {         // 重写 Len() 方法
 	return len(a)
 }
@@ -40,10 +46,19 @@ func (a StockSlice) Swap(i, j int){     // 重写 Swap() 方法
 	//fmt.Println(i,j)
 	a[i], a[j] = a[j], a[i]
 }
+func (a StockSliceRO) Less(i, j int) bool {    // 重写 Less() 方法， 从大到小排序
+	return a[j].RO < a[i].RO
+}
+func (a StockSliceRO) Len() int {         // 重写 Len() 方法
+	return len(a)
+}
+func (a StockSliceRO) Swap(i, j int){     // 重写 Swap() 方法
+	//fmt.Println(i,j)
+	a[i], a[j] = a[j], a[i]
+}
 func (a StockSlice) Less(i, j int) bool {    // 重写 Less() 方法， 从大到小排序
 	return a[j].Value < a[i].Value
 }
-
 func trim(str string)string  {
 	str = strings.Replace(str, " ", "", -1)
 	// 去除换行符
@@ -104,23 +119,43 @@ func loadStock()error  {
 			fmt.Println("step convert error" ,err)
 			continue
 		}
+		info.ShortQuery, err = toFloat(items[5])
+		if err!= nil{
+			fmt.Println("ShortQuery convert error" ,err)
+			continue
+		}
 		info.RO, err = toFloat(items[7])
+		if err!= nil{
+			fmt.Println("step convert error" ,err)
+			continue
+		}
+		info.HGT, err = toFloat(items[6])
 		if err!= nil{
 			fmt.Println("step convert error" ,err)
 			continue
 		}
 		stocks[info.Code] = info
 		stockArr = append(stockArr,info)
+		stockArrRO =append(stockArrRO,info)
+		if info.HGT == 1{
+			StockSliceHGT=append(StockSliceHGT,info)
+		}
 		mutex.Unlock()
 	}
 
-	sort.Sort(stockArr)    // 按照 Age 的逆序排序
+	sort.Sort(stockArr)    // 按照 黑马系数 的逆序排序
+	sort.Sort(stockArrRO)    // 按照 多空系数 的逆序排序
 	//fmt.Println(stockArr)
 	index := sort.Search(len(stockArr), func(i int) bool { return stockArr[i].Value < 100 })
 	if index < len(stockArr) {
 		stockIndex = index
 	}
+	index = sort.Search(len(stockArrRO), func(i int) bool { return stockArr[i].ShortQuery < 10 })
+	if index < len(stockArrRO) {
+		stockRoIndex = index
+	}
 	fmt.Println("stockIndex=",stockIndex)
+	fmt.Println("stockRoIndex=",stockRoIndex)
 	fmt.Println("items count=",len(stocks))
 	//fmt.Println(stockArr)
 	return nil
@@ -188,7 +223,42 @@ func advanceQueryStock(c *gin.Context){
 		"data":stockArr[:stockIndex],
 	})
 }
+//短线查询
+func ShortQueryStock(c *gin.Context){
+	//score:=DefaultQueryInt(c,"score",100)
 
+	if err:=checkPermission(c,1);err!=nil{
+		SuccessQueryResponse(c,gin.H{
+			"error":1,
+			"message":fmt.Sprintf("%s",err),
+		})
+		return
+	}
+
+	c.IndentedJSON(200,gin.H{
+		"error":0,
+		"message":"ok",
+		"data":stockArrRO[:stockRoIndex],
+	})
+}
+//互通查询
+func HGTQueryStock(c *gin.Context){
+	//score:=DefaultQueryInt(c,"score",100)
+
+	if err:=checkPermission(c,2);err!=nil{
+		SuccessQueryResponse(c,gin.H{
+			"error":1,
+			"message":fmt.Sprintf("%s",err),
+		})
+		return
+	}
+
+	c.IndentedJSON(200,gin.H{
+		"error":0,
+		"message":"ok",
+		"data":StockSliceHGT,
+	})
+}
 func basicQueryStock(c *gin.Context)  {
 
 

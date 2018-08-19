@@ -49,6 +49,8 @@ func RouteRegister(e *gin.Engine)  {
 	e.Static("/admin","./static/admin")
 	e.GET("/stock/basic/:id",basicQueryStock)
 	e.GET("/stock/advance",advanceQueryStock)
+	e.GET("/stock/hgt",HGTQueryStock)
+	e.GET("/stock/short",ShortQueryStock)
 	e.POST("/upload",uploadFile)
 	e.POST("/stock/users",AddUsers)
 	e.GET("/stock/users",GetUsers)

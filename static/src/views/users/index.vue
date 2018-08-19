@@ -34,20 +34,20 @@
     </el-table-column>
     <el-table-column
       prop="phone"
-       width="100"
+       width="120"
       label="电话号码">
     </el-table-column>
      <el-table-column
       prop="pay_type"
        width="100"
       :formatter="formatPayType"
-      label="付费服务类型">
+      label="付费类型">
     </el-table-column>
    <el-table-column
       prop="login_date"
        width="100"
       :formatter="formatLoginDateTime"
-      label="登录时间">
+      label="最后登录">
     </el-table-column>
        <el-table-column
       prop="login_count"
