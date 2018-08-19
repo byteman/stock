@@ -330,6 +330,8 @@ func uploadFile(c *gin.Context)  {
 	}else if file.Filename == "stockhelp.html"{
 		c.SaveUploadedFile(file,"static/dist/"+file.Filename)
 		convGbk2Utf8("static/dist/" + file.Filename)
+	}else {
+		c.SaveUploadedFile(file,"static/dist/upload/"+file.Filename)
 	}
 
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
