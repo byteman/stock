@@ -51,7 +51,7 @@ func (a StockSlice) Swap(i, j int){     // 重写 Swap() 方法
 	a[i], a[j] = a[j], a[i]
 }
 func (a StockSliceRO) Less(i, j int) bool {    // 重写 Less() 方法， 从大到小排序
-	return a[j].RO < a[i].RO
+	return a[j].ShortQuery < a[i].ShortQuery
 }
 func (a StockSliceRO) Len() int {         // 重写 Len() 方法
 	return len(a)
