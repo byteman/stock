@@ -144,18 +144,18 @@ func loadStock()error  {
 	}
 
 	sort.Sort(stockArr)    // 按照 黑马系数 的逆序排序
-	sort.Sort(stockArrRO)    // 按照 多空系数 的逆序排序
+	sort.Sort(stockArrRO)    // 按照 短线系数 的逆序排序
 	//fmt.Println(stockArr)
 	index := sort.Search(len(stockArr), func(i int) bool { return stockArr[i].Value < 100 })
 	if index < len(stockArr) {
 		stockIndex = index
 	}
-	index = sort.Search(len(stockArrRO), func(i int) bool { return stockArr[i].ShortQuery < 10 })
+	index = sort.Search(len(stockArrRO), func(i int) bool { return stockArrRO[i].ShortQuery < 10 })
 	if index < len(stockArrRO) {
 		stockRoIndex = index
 	}
-	fmt.Println("stockIndex=",stockIndex)
-	fmt.Println("stockRoIndex=",stockRoIndex)
+	fmt.Println("< 100 StockIndex=",stockIndex)
+	fmt.Println("< 10  ShortIndex=",stockRoIndex)
 	fmt.Println("items count=",len(stocks))
 	//fmt.Println(stockArr)
 	return nil
