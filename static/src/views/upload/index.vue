@@ -7,7 +7,7 @@
   :on-success="handleOnSuccess"
   :file-list="fileList">
   <el-button size="small" type="primary">点击上传</el-button>
-  <div slot="tip" class="el-upload__tip">只能上传txt文件</div>
+  <div slot="tip" class="el-upload__tip"></div>
 </el-upload>
 
 
@@ -32,10 +32,10 @@
           center: true
         })
       }
-  
+
     }
   }
-  
+
 </script>
 
 <style scoped>
