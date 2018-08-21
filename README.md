@@ -14,3 +14,8 @@
 
 
 icon资源 :http://www.easyicon.net
+
+
+stock.jks
+
+密码都是123456
