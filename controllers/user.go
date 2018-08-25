@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"stock/models"
 	"io/ioutil"
+	"fmt"
 )
 
 
@@ -83,10 +84,18 @@ func AddUsers(c *gin.Context)  {
 	if err!=nil{
 		ErrorInvalidParam(c,err)
 	}
-
+	if models.GetUserByUUID(user.UUID){
+		c.JSON(400,gin.H{
+			"message":fmt.Errorf("该手机已经注册注册过了"),
+		})
+		return
+	}
 	err= models.AddUser(&user)
 	if err!=nil{
-		ErrorDB(c,err)
+
+		c.JSON(400,gin.H{
+			"message":err,
+		})
 		return
 	}
 	SuccessCreated(c)

@@ -24,6 +24,7 @@ type User struct {
 	LoginDate int64 `json:"login_date" gorm:"not null;default:0"` //最后登录时间
 	QueryCount int `json:"query_count" gorm:"not null;default:0"` //查询时间记录.
 	LoginCount int `json:"login_count" gorm:"not null;default:0"` //记录登录次数.
+	UUID string `json:"uuid"` //用户手机的唯一ID.
 }
 //判断普通用户是否过期
 func (u *User)NormalIsExpire()bool{
@@ -100,12 +101,20 @@ func GetUserByName(name string)(u *User,e error)  {
 	 }
 	return u,nil
 }
+func GetUserByUUID(uuid string)(bool)  {
+	u:=&User{}
+	if err:=g.Where("uuid=?",uuid).First(u).Error; err!=nil{
+		return false
+	}
+	return true
+}
 
 
 
 func AddUser(u *User) error{
 	u.RegDate = time.Now().Unix()
 	u.PayType = 0
+
 	db:=g.Create(u)
 	if db.Error!=nil{
 		return db.Error
@@ -148,12 +157,13 @@ func RemoveUserByOrgId(oid int) error {
 	}
 	return nil
 }
-func CheckLogin(user,password string) error {
+func CheckLogin(user,password,uuid string) error {
 	u:=User{}
 	if user=="admin" && password=="admin"{
 		return nil
 	}
-	if err:=g.Where("name=? and pass_word=?",user,password).Find(&u).Error;err!=nil{
+	fmt.Println("Login name=",user,"password=",password,"uuid=",uuid)
+	if err:=g.Where("name=? and pass_word=? and uuid=?",user,password,uuid).Find(&u).Error;err!=nil{
 		return err
 	}
 	return nil

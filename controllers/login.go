@@ -55,7 +55,9 @@ func helloHandler(c *gin.Context) {
 // Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTYyMTM3NTUsImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTQ5NjIxMDE1NX0.tDxSCsWRCCUdmjon5YUcjKqe7UCN0kC05KbFQghaMho
 func MyAuthenticator(userID string, password string, c *gin.Context) (string, bool) {
 
-	err:=models.CheckLogin(userID,password)
+	uuid:=c.GetHeader("uuid")
+
+	err:=models.CheckLogin(userID,password,uuid)
 
 	if err!=nil{
 		seelog.Errorf("Login failed %v",err)
@@ -86,6 +88,8 @@ func MyPayLoadFunc(userId string)map[string]interface{}{
 }
 func MyAuthorizator(userId string, c *gin.Context)bool  {
 
+
+	//判断某个
 	return true
 }
 func MyUnauthorized(c *gin.Context, code int, message string)()  {
