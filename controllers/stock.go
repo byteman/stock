@@ -319,7 +319,7 @@ func basicQueryStock(c *gin.Context)  {
 			Step:value.Step,
 			RO:value.RO,
 			Error:1,
-			Message:"not exist",
+			Message:"该股票不存在",
 		})
 	}
 }
