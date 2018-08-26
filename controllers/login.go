@@ -57,13 +57,17 @@ func MyAuthenticator(userID string, password string, c *gin.Context) (string, bo
 
 	uuid:=c.GetHeader("uuid")
 
-	err:=models.CheckLogin(userID,password,uuid)
-
+	user,err:=models.GetUserByName(userID)
 	if err!=nil{
-		seelog.Errorf("Login failed %v",err)
-		return userID,false
+		return "找不到该账号",false
+	}
+	if user.PassWord != password{
+		return "账号或者密码错误",false
 	}
 
+	if user.UUID != uuid{
+		return "您的账号在非注册手机登陆，登陆失败\r\n如果您是正常更换手机，请用QQ：492951940与服务方联系",false
+	}
 	//添加一条登录记录
 	if user,err:=models.GetUserByName(userID);err==nil{
 		models.AddLoginLog(user)
@@ -92,6 +96,7 @@ func MyAuthorizator(userId string, c *gin.Context)bool  {
 	//判断某个
 	return true
 }
+//严重不成功返回的消息.
 func MyUnauthorized(c *gin.Context, code int, message string)()  {
 	c.JSON(code, gin.H{
 		"code":    code,

@@ -86,7 +86,7 @@ func AddUsers(c *gin.Context)  {
 	}
 	if models.GetUserByUUID(user.UUID){
 		c.JSON(400,gin.H{
-			"message":fmt.Errorf("该手机已经注册注册过了"),
+			"message":"该手机已经注册注册过了",
 		})
 		return
 	}
