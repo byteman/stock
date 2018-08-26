@@ -33,6 +33,7 @@ type StockInfo struct{
 	ShortQuery float64 `json:"short_query"` //短线查询 6列
 }
 var stocks map[string]StockInfo
+//var namestocks map[string]StockInfo
 
 type StockSlice []StockInfo
 type StockSliceRO []StockInfo
@@ -157,6 +158,7 @@ func loadStock()error  {
 			continue
 		}
 		stocks[info.Code] = info
+		stocks[info.Name] = info
 		stockArr = append(stockArr,info)
 		stockArrRO =append(stockArrRO,info)
 		if info.HGT == 1{
@@ -295,6 +297,7 @@ func basicQueryStock(c *gin.Context)  {
 
 	id:=c.Param("id")
 
+	//strconv.ParseInt()
 
 	if value, ok := stocks[id]; ok {
 		c.JSON(200,&StockResult{
