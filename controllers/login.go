@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"stock/models"
 
-	"github.com/cihub/seelog"
 )
 
 
