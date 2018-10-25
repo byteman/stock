@@ -32,6 +32,13 @@ type PBINFO struct{
 		Values []float32 `json:"values"`
 	} `json:"市净率"`
 }
+
+type RATIOINFO struct {
+	RATIO struct {
+		Dates  []string  `json:"dates"`
+		Values []float32 `json:"values"`
+	} `json:"近4季净利润"`
+}
 type ROICINFO struct{
 	ROIC struct {
 		Dates  []string  `json:"dates"`
@@ -124,6 +131,67 @@ func RequestROCI(code string)(value float32,err error){
 	index:=len(roci.ROIC.Values)-1
 	return roci.ROIC.Values[index],nil
 }
+//统计后一个季度大于前一个季度的总数目
+func GetUpTotal(values []float32)int {
+	var total = 0
+	if len(values) == 0{
+		return 0
+	}
+	if len(values) == 1{
+		return 0
+	}
+	for i:=0; i< len(values)-1;i++{
+
+		if values[i+1] > values[i]{
+			total++
+		}
+	}
+	return total
+}
+//统计最后一个季度连续大于前面多少个季度
+func GetLastUpTotal(values []float32)int {
+	var total = 0
+	if len(values) == 0{
+		return 0
+	}
+	if len(values) == 1{
+		return 0
+	}
+	for i:=len(values)-1; i > 0;i--{
+
+		if values[i] > values[i-1]{
+			total++
+		}else{
+			break
+		}
+	}
+	return total
+}
+func RequestRATIOS(code string)(value string,err error){
+	var ratio RATIOINFO
+	err=Request("https://api.wayougou.com/api/ratios/stock?code="+code+"&name=%E5%87%80%E5%88%A9%E6%B6%A6&chart=%E8%BF%914%E5%AD%A3%E5%87%80%E5%88%A9%E6%B6%A6",&ratio)
+	if err!=nil{
+		fmt.Println(err)
+		return "0.0",err
+	}
+	if len(ratio.RATIO.Values) == 0{
+		return "0.0",fmt.Errorf("没有找到%s的RATIO数据",code)
+	}
+	var values []float32
+	if len(ratio.RATIO.Values) >= 21{
+		pos:=len(ratio.RATIO.Values) - 21
+		values = ratio.RATIO.Values[pos:]
+	}else{
+		values = ratio.RATIO.Values
+	}
+	zs:=GetUpTotal(values)
+	xs:=GetLastUpTotal(values)
+	return fmt.Sprintf("%d.%02d",zs,xs),nil
+
+}
+
+
+//https://wayougou.com/stock/002415/净利润/近4季净利润
 var target_file *os.File
 var codes []string //股票代码列表
 var base = 2
@@ -182,7 +250,7 @@ return nil
 }
 func ReadThenWriteStock(code string) (err error) {
 	var pe,pb,peg,roic float32
-
+	var ratio string
 
 	if roic,err=RequestROCI(code);err !=nil{
 		fmt.Println(err)
@@ -197,10 +265,14 @@ func ReadThenWriteStock(code string) (err error) {
 	if peg,err=RequestPEG(code);err!=nil{
 		return
 	}
+	if ratio,err=RequestRATIOS(code);err!=nil{
+		return
+	}
 	fmt.Println("pb  =",pb)
 	fmt.Println("pe  =",pe)
 	fmt.Println("peg =",peg)
 	fmt.Println("roic=",roic)
+	fmt.Println("ratio=",ratio)
 	var pbs = fmt.Sprintf("%f",pb)
 	if len(pbs) > 4{
 		pbs=pbs[:4]
@@ -217,7 +289,8 @@ func ReadThenWriteStock(code string) (err error) {
 	if len(roics) > 4{
 		roics=roics[:4]
 	}
-	_, err = target_file.WriteString(fmt.Sprintf("%s,%s,%s,%s,%s\r\n",code,pes,pbs,pegs,roics)) //写入文件(字节数组)
+
+	_, err = target_file.WriteString(fmt.Sprintf("%s,%s,%s,%s,%s,%s\r\n",code,pes,pbs,pegs,roics,ratio)) //写入文件(字节数组)
 
 	return err
 }
